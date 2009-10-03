@@ -9,8 +9,8 @@ my %OPTS;
 # ourselves later.
 BEGIN { local @ARGV=@ARGV; getopts("dm:M:c:p:", \%OPTS) };
 # d daemon
-# m only this role(s)
-# M Every role but this Not Implemented
+# m only these role(s)
+# M Every role but this: Not Implemented
 # c conf file
 # p plugin conf file
 
