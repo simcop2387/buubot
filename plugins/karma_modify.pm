@@ -57,10 +57,11 @@ sub handle {
 	if( $body =~ /\(([^\)]+)\)(\+\+|--)/ or $body =~ /(\w+)(\+\+|--)/ ) {
 		my( $subject, $op ) = ($1,$2);
 		if( $op eq '--' ) { $op = -1 } elsif( $op eq '++' ) { $op = 1 }
+		my $lirc = l_irc($subject) || lc $subject;
 
 		$self->dbh->do( "INSERT INTO karma (subject,operation,author,modified_time) VALUES (?,?,?,?)",
 			undef,
-			l_irc( $subject ),
+			$lirc,
 			$op,
 			$said->{name},
 			scalar time,

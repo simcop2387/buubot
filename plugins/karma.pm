@@ -18,10 +18,11 @@ sub {
 		{ RaiseError => 1, PrintError => 0 }
 	);
 
+        my $lirc = l_irc($said->{body}) || lc $said->{body};
 	my $karma = $dbh->selectrow_arrayref(
 		"SELECT sum(operation) FROM karma WHERE subject = ?",
 		undef,
-		l_irc( $said->{body} ),
+		$lirc,
 	);
 
 	if( $karma and @$karma ) {
