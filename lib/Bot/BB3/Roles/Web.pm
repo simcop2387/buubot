@@ -132,7 +132,7 @@ __DATA__
 	<body onload="document.getElementById('body_field').focus()">
 		Welcome to the BB3 web interface. You can interact with the bot by typing bot commands in to the text box below. It acts exactly as if you have typed the command in a private message to the bot. Try the command 'help' or 'plugins' (no quotes).
 		<form method="post" action="/request">
-		Input: <input type="text" name="body" id="body_field"> <input type="submit" value="go"> <br>
+		Input: <input type="text" name="body" id="body_field" size="64"> <input type="submit" value="go"> <br>
 		</form>
 		Output: %%OUTPUT%%
 	</body>
