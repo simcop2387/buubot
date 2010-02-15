@@ -214,7 +214,8 @@ use Storable qw/nfreeze/; nfreeze([]); #Preload Nfreeze since it's loaded on dem
 
 		my $out = ref($ret) ? Dumper( $ret ) : "" . $ret;
 
-		select STDOUT; local $\;
+		select STDOUT; 
+    local $\;
 
 		print $out;
 
