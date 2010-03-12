@@ -88,7 +88,8 @@ sub {
 	#Minerals: 75 Hotkey: R Hit Points: 145 Mutater: Larva Speed: Normal Build Time: 27 Movement: Normal Modifiers: Armored - Biological Acid Saliva:  Requires: Roach Warren Damage: 16 (+2) Supply: 1 Range: 3 Targets: Ground Vespene: 25 Armor: 2 (+1) 
 
 	my $bonus = $stats{bonus} ? " Bonus: $stats{bonus};" : "";
-	print "$name - Cost [$stats{minerals}/$stats{vespene}/$stats{'build time'}s] HP/A/D: $stats{'hit points'}/$stats{damage}/$stats{armor} - $stats{modifiers};$bonus Range: $stats{range}, Speed: $stats{movement};";
+	my $shields = $stats{shields} ? "$stats{shields}+":"";
+	print "$name - Cost [$stats{minerals}/$stats{vespene}/$stats{'build time'}s] HP/A/D: $shields$stats{'hit points'}/$stats{damage}/$stats{armor} - $stats{modifiers};$bonus Range: $stats{range}, Speed: $stats{movement};";
 }
 
 
