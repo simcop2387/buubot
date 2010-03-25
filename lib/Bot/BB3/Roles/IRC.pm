@@ -490,6 +490,16 @@ sub plugin_output {
 	return unless $text =~ /\S/;
 	$text =~ s/\0/\\0/g; # Replace nulls to prevent them truncating strings we attempt to output.
 
+	if ($text =~ /DCC\s+SEND\s+/) {
+    		if ($said->{channel} eq "*irc_msg") {
+    			#we don't care about it if they're doing it to themselves in /msg
+			1;
+    		}
+    		else {
+    			$text = "I can't do that, if i did both you and i could get in trouble.";
+    		}
+    	}
+
 	my $pci = $self->get_component( $said->{pci_id} );
 
 	# sub send_text( $said, $text )  !
