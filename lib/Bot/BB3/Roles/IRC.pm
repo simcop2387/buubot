@@ -29,9 +29,21 @@ sub new {
 	for( @$bots ) {
 	warn "Spawning Bot: ", Dumper $_;
 
-	# Blah blah evil
-	my $ip = `/sbin/ifconfig | perl -nle' if( /inet addr:(\\d+\\.\\d+\\.\\d+\\.\\d+)/ ) { print \$1; exit }'`;
-	# This is to fix a bug with dcc not recognizing our ip..
+    # Blah blah evil
+    my $ip = `/sbin/ifconfig | perl -nle' if( /inet addr:(\\d+\\.\\d+\\.\\d+\\.\\d+)/ ) { print \$1; exit }'`;
+    # This is to fix a bug with dcc not recognizing our ip..
+    
+    # GIANT HACK to identify to freenode. 
+    # It's mostly there to store the auth password in my homedir so it never
+    # gets accidentally put into the svn repo.
+    if( $_->{server} =~ /freenode/ ) {
+      open my $fh, "$ENV{HOME}/nickservpass" or goto HACKEND; #sorry
+      my $pass = <$fh>;
+      chomp $pass;
+      $_->{password} ||= $pass; # Assign to the conf so we send it as a server pass
+    }
+    HACKEND:
+    # END HACK
 
 		my $poco_irc = POE::Component::IRC::State->spawn( 
 				nick     => $_->{nick} || $_->{botname},
@@ -358,17 +370,6 @@ sub irc_001 {
 
 	my $channels = $bot_conf->{channel};
 	
-	# GIANT HACK
-	if( $bot_conf->{server} =~ /freenode/ ) {
-		open my $fh, "/home/buu/nickservpass" or goto HACKEND; #sorry
-		my $pass = <$fh>;
-		chomp $pass;
-
-		$kernel->post( $sender, privmsg => 'nickserv', "identify $pass" );
-	}
-	HACKEND:
-	# END HACK
-	
 	# May be an array ref.
 	for( ref $channels ? @$channels : $channels ) {
 		$kernel->post( $sender, join => $_ );
@@ -490,15 +491,9 @@ sub plugin_output {
 	return unless $text =~ /\S/;
 	$text =~ s/\0/\\0/g; # Replace nulls to prevent them truncating strings we attempt to output.
 
-	if ($text =~ /DCC\s+SEND\s+/) {
-    		if ($said->{channel} eq "*irc_msg") {
-    			#we don't care about it if they're doing it to themselves in /msg
-			1;
-    		}
-    		else {
-    			$text = "I can't do that, if i did both you and i could get in trouble.";
-    		}
-    	}
+	if ($text =~ /DCC\s+SEND\s+/ 
+		$text = "I can't do that, if I did both you and I could get in trouble.";
+	}
 
 	my $pci = $self->get_component( $said->{pci_id} );
 
