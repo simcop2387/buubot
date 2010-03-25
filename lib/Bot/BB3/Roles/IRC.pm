@@ -491,7 +491,7 @@ sub plugin_output {
 	return unless $text =~ /\S/;
 	$text =~ s/\0/\\0/g; # Replace nulls to prevent them truncating strings we attempt to output.
 
-	if ($text =~ /DCC\s+SEND\s+/ 
+	if( $text =~ /DCC\s+SEND\s+d/ ) {
 		$text = "I can't do that, if I did both you and I could get in trouble.";
 	}
 
