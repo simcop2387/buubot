@@ -59,3 +59,5 @@ sub {
 	print $m->runString( $said->{body} );
 }
 
+__DATA__
+Evaluate an expression in simcop2387's farnsworth langauge, see http://simcop2387.info/
