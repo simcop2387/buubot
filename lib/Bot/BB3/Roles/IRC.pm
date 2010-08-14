@@ -111,7 +111,16 @@ sub new {
 sub _build_ignore_hash {
 	my( $self, $pci_id, $pci_conf ) = @_;
 
-	for( @{ $pci_conf->{ignore} } ) {
+	my @ignore;
+
+	if (ref($pci_conf->{ignore})) {
+		@ignore = @{$pci_conf->{ignore}};
+	}
+	else {
+		@ignore = $pci_conf->{ignore};
+	}
+
+	for( @ignore ) {
 		$self->{bot_ignores}->{$pci_id}->{l_irc $_} = $pci_id;
 	}
 }
