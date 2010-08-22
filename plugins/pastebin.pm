@@ -45,11 +45,14 @@ warn "Triggered on $site/$id";
 	}
 	
 	my $paste;
-	if( $site =~ /pastebin\.(?:com|org)/ )
+	if( $site =~ /pastebin\.com/ )
 	{
-		$paste = get("http://$site/pastebin.php?dl=$id");
+		$paste = get("http://$site/download.php?i=$id");
 	}
-	
+	elsif( $site =~ /pastebin\.org/ ) 
+	{
+		$paste = get("http://pastebin.org/pastebin.php?dl=$id");
+	}
 	elsif( $site =~ /pastebin\.ca/ )
 	{
 		$paste = get("http://$site/raw/$id");
