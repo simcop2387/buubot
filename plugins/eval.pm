@@ -16,7 +16,7 @@ sub new {
 	$self->{opts} = {
 		command => 1,
 	};
-	$self->{aliases} = [ qw/jseval jeval phpeval pleval perleval deparse k20eval rbeval pyeval luaeval/ ];
+	$self->{aliases} = [ qw/jseval jsv8 jeval phpeval pleval perleval deparse k20eval rbeval pyeval luaeval/ ];
 
 	return $self;
 }
@@ -31,6 +31,7 @@ sub command {
 	warn "Initial type: $type\n";
 	my %translations = ( 
 		js => 'javascript', 
+		jsv8 => 'jsv8',
 		perl => 'perl',
 		pl => 'perl',
 		php => 'php',

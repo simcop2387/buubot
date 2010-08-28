@@ -6,6 +6,11 @@ use Scalar::Util; #Required by Data::Dumper
 use BSD::Resource;
 use File::Glob;
 use POSIX;
+use Errno;
+
+eval { require Lingua::EN::Inflect; }; # Load optional module
+eval { require feature; }; # More optionals
+eval { require Data::Munge; }; #optional
 
 # This sub is defined here so that it is defined before the 'use charnames'
 # command. This causes extremely strange interactions that result in the
@@ -39,6 +44,10 @@ use B::Deparse;
 BEGIN{ eval "use JavaScript::SpiderMonkey;"; }
 my $JSENV_CODE = do { local $/; open my $fh, "deps/env.js"; <$fh> };
 require 'bytes_heavy.pl';
+
+# Javascript V8 stuff
+BEGIN{ eval "use JavaScript::V8"; }
+my $js_v8_context = JavaScript::V8::Context->new;
 
 use Tie::Hash::NamedCapture;
 
@@ -124,7 +133,7 @@ use Storable qw/nfreeze/; nfreeze([]); #Preload Nfreeze since it's loaded on dem
 	
 	my $kilo = 1024;
 	my $meg = $kilo * $kilo;
-	my $limit = 50 * $meg;
+	my $limit = 75 * $meg;
 
 	(
 	setrlimit(RLIMIT_DATA, $limit, $limit )
@@ -170,6 +179,9 @@ use Storable qw/nfreeze/; nfreeze([]); #Preload Nfreeze since it's loaded on dem
 	}
 	elsif( $type eq 'javascript' ) {
 		javascript_code($code);
+	}
+	elsif( $type eq 'jsv8' ) {
+		javascript_v8_code($code);
 	}
 	elsif( $type eq 'php' ) {
 		php_code($code);
@@ -260,6 +272,14 @@ use Storable qw/nfreeze/; nfreeze([]); #Preload Nfreeze since it's loaded on dem
 		print $js->ret_eval($modified_code);
 
 		if( $@ ) { print "ERROR: $@"; }
+	}
+
+	sub javascript_v8_code {
+		my( $code ) = @_;
+
+		my $context = JavaScript::V8::Context->new;
+
+		print $context->eval( $code );
 	}
 
 	sub ruby_code {
