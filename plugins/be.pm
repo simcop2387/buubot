@@ -4,8 +4,10 @@ use strict;
 
 sub {
 	my($said, $pm) = @_;
-	my($person, $search_sep, $search_term) = 
+	my($person, $search_sep, @search_terms) = 
 		@{$said->{recommended_args}};
+	my $search_term = join '.*', map quotemeta, @search_terms;
+	$search_term = qr/$search_term/i;
 	
 	my $quotedir = $pm->get_main_conf->{be}->{quotes_dir} || "/dev/null";
 	-d $quotedir or 
@@ -22,7 +24,7 @@ sub {
 		my @quotes;
 		while(<$fh>)
 		{
-			if( /\Q$search_term/i )
+			if( /$search_term/ )
 			{
 				push @quotes, $_;
 			}
