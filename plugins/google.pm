@@ -25,9 +25,12 @@ sub {
 	print " ";
 
 	for( $first_desc->content_list ) {
-	  last if ref $_ and $_->tag eq 'cite';
+	  last if ref $_ 
+			and ( $_->tag eq 'cite' 
+				or $_->attr('class') eq 'osl'
+				or $_->attr('class') eq 'f' );
 
-		  print ref $_ ? $_->as_text : $_;
+		print ref $_ ? $_->as_text : $_;
 	}
 }
 
