@@ -4,6 +4,8 @@ use Bot::BB3::Logger;
 use POE;
 use POE::Component::Server::SimpleHTTP;
 use HTTP::Status;
+use URI::Escape qw/uri_unescape/;
+use HTML::Entities qw/encode_entities/;
 use CGI; #Heh.
 use strict;
 
@@ -17,7 +19,7 @@ sub new {
 
 	my $session = $self->{session} = POE::Session->create(
 		object_states => [
-			$self => [ qw/_start handle_request display_page plugin_output sig_DIE/ ]
+			$self => [ qw/_start handle_request irc_links display_page plugin_output sig_DIE/ ]
 		]
 	);
 
@@ -35,6 +37,11 @@ sub _start {
 		ALIAS => 'web_httpd_alias',
 		HANDLERS => [
 			{
+				DIR => '^/links',
+				SESSION => 'web_interface',
+				EVENT => "irc_links",
+			},
+			{
 				DIR => '^/request',
 				SESSION => "web_interface",
 				EVENT => "handle_request",
@@ -50,6 +57,39 @@ sub _start {
 
 	$kernel->alias_set( "web_interface" );
 	$kernel->sig("DIE" => 'sig_DIE' );
+}
+
+my $DBH;
+sub irc_links {
+	my( $self, $req, $resp ) = @_[OBJECT,ARG0,ARG1];
+	my $path = $req->uri->path;
+	$path =~ s{.*?/links/}{};
+	$path = uri_unescape( $path );
+	if( $path !~ /^#/ ) { $path = "#$path"; }
+
+
+	if( not $DBH or not $DBH->ping ) {
+		$DBH = DBI->connect("dbi:SQLite:dbname=var/irclinks.db","","");
+	}
+
+	my $links = $DBH->selectall_arrayref( 
+		"SELECT uri FROM irclinks WHERE channel=? ORDER BY time_inserted DESC",
+		undef,
+		$path
+	);
+
+	my $output;
+	for( @$links ) {
+		my $link = encode_entities( $_->[0] );
+		$output .= "<a href='$link'>$link</a><br>\n";
+	}
+
+
+	$resp->code(RC_OK);
+	$resp->content_type("text/html");
+	$resp->content( "<http><head></head><body>Links $path:<br>\n$output</body></html>" );
+
+	$_[KERNEL]->post(  web_httpd_alias => 'DONE' => $resp );
 }
 
 sub display_page {

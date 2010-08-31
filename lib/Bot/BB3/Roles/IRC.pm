@@ -308,7 +308,7 @@ sub _said {
 		my $aliases = $self->get_aliases( $pci );
 		my $name_re = "(?:" . join( "|", map "(?:$_)", $said->{my_name}, @$aliases ) . ")"; 
 
-		if( $body =~ s/^\s*($name_re)\b\s*[;:,. \t-]?\s*// ) {
+		if( $body =~ s/^\s*($name_re)\s*[;:,. \t-]?\s*// ) {
 			$said->{body} = $body;
 			$said->{addressed} = 1;
 			$said->{addressed_as} = $1;
