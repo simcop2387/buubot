@@ -46,8 +46,8 @@ my $JSENV_CODE = do { local $/; open my $fh, "deps/env.js"; <$fh> };
 require 'bytes_heavy.pl';
 
 # Javascript V8 stuff
-BEGIN{ eval "use JavaScript::V8"; }
-my $js_v8_context = JavaScript::V8::Context->new;
+my $js_v8_context;
+BEGIN{ eval "use JavaScript::V8"; if( not $@ ) {  $js_v8_context = JavaScript::V8::Context->new; } }
 
 use Tie::Hash::NamedCapture;
 
