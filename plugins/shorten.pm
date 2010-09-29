@@ -27,7 +27,9 @@ sub from_from {
                 $said->{name}
                 || '#' .$said->{channel}
         );
-} 
+}
+
+
 
 sub handle {
 	my( $self, $said, $pm ) = @_;
@@ -37,13 +39,20 @@ sub handle {
     my $said_in = $self->from_from( $said );
 
     # just so we don't make the last expicit shorten the next implicit shorten
-    return if $text =~ /^shorten/i;
+    return if $text =~ /^\s*shorten/i;
+    use URI::Find;
 
-    if ($text =~ m{(http(?:s?)://[^ ]+)}){
-        $self->{previous_url}{ $said_in } = $1;
+    my @uris;
+    my $finder = URI::Find->new(sub {
+            my($uri) = shift;
+            push @uris, $uri;
+        });
+    $finder->find(\$text);
+
+    $self->{previous_url}{ $said_in } = $uris[-1] if @uris;
+        #\@uris;
         # return "Snagged '$1' for later shortening"
-    }
-    return ;
+    return ();
 }
 
 sub command {
@@ -57,7 +66,8 @@ sub command {
         $uri_text =  $self->{previous_url}{ $said_in };
 
         return ('handled',"I have no idea what 'it' refers to... ")
-            if  not defined $uri_text or $uri_text eq '';
+            if  not defined $uri_text or $uri_text eq ''
+            and $said->{addressed};
     }
 
     return ('handled', 'the empty string is already pretty short...')
@@ -68,8 +78,13 @@ sub command {
     
     my $uri = URI->new( $uri_text ); 
     
-    return ('handled', "That's a silly url.") if $short eq '' and $said->{addressed}; 
-    return ('handled', sprintf "%s (at %s)", $short, $uri->host);
+    return ('handled', "That's a silly url.") if $short eq '';
+    #and $said->{addressed}; 
+
+    return ('handled', sprintf "%s (at %s)", $short,
+       $uri->can('host') ? $uri->host
+                         : $uri
+                     );
 
 
 }
@@ -77,5 +92,4 @@ sub command {
 
 'Bot::BB3::Plugin::Shorten'
 __DATA__
-shorten <url> returns the "short form" of a url. Defaults to using xrl.us.
-shorten it returns ths short form of the previous url mentioned
+shorten <url> returns the "short form" of a url. Defaults to using xrl.us. a <url> of 'it' shortens the last url said
