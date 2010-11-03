@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 # the contents of the Makefile that is written.
 
 # path where the shared library libj601.so resides
-$jlibpath = "/home/ambrus/local/lib";
+$JLIBPATH = $ENV{JLIBPATH} || "/home/buu/build/j64-602/bin";
 
 WriteMakefile(
     NAME              => 'Jplugin',
@@ -13,7 +13,7 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Jplugin.pm', # retrieve abstract from module
        AUTHOR         => 'Zsban Ambrus <ambrus@math.bme.hu>') : ()),
-    LIBS              => ['-lj'], # e.g., '-lm'
+    LIBS              => ['-L' . $JLIBPATH . ' -lj'], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
 	# Un-comment this if you add C files to link with later:
